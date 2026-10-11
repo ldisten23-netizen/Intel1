@@ -1,0 +1,42 @@
+plugins {
+    id 'com.android.application'
+    id 'com.chaquo.python'
+}
+
+android {
+    namespace 'za.intel.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "za.intel.app"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+        ndk {
+            abiFilters "arm64-v8a", "x86_64"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+chaquopy {
+    defaultConfig {
+        version "3.12"
+        pip {
+            install "Flask==3.0.3"
+            install "requests==2.32.3"
+        }
+        // templates/ and static/ must exist as real files for Flask, so the web app package is extracted at start-up
+        extractPackages "intel"
+    }
+}
