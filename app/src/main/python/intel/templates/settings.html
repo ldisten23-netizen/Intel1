@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Settings</h1>
+<form method="post">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <fieldset><legend>Search service</legend><div class="grid">
+    <div class="full"><label for="api_key">API key</label>
+      <input id="api_key" name="api_key" type="password" autocomplete="off" placeholder="{{ key_hint if has_key else 'Paste your API key' }}">
+      <small class="muted">{% if has_key %}A key is saved ({{ key_hint }}). Leave this blank to keep it, or paste a new one to replace it.{% else %}No key saved yet.{% endif %}</small></div>
+    <div><label for="mode">Mode</label>
+      <select id="mode" name="mode">
+        <option value="sandbox" {{ 'selected' if mode == 'sandbox' }}>Sandbox (test data)</option>
+        <option value="production" {{ 'selected' if mode == 'production' }}>Production (real searches)</option>
+      </select></div>
+  </div></fieldset>
+  <div class="btnrow"><button type="submit">Save settings</button></div>
+</form>
+
+<form method="post" style="margin-top:22px">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <input type="hidden" name="action" value="password">
+  <fieldset><legend>Change password</legend><div class="grid">
+    <div class="full"><label for="current">Current password</label><input id="current" name="current" type="password" autocomplete="current-password" required></div>
+    <div><label for="new">New password</label><input id="new" name="new" type="password" autocomplete="new-password" required minlength="6"></div>
+    <div><label for="again">Repeat new password</label><input id="again" name="again" type="password" autocomplete="new-password" required minlength="6"></div>
+  </div></fieldset>
+  <div class="btnrow"><button type="submit">Change password</button></div>
+</form>
+{% endblock %}
