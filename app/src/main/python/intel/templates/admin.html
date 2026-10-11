@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Signals</h1>
+<form method="post" action="{{ url_for('admin_signal') }}">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <div class="grid">
+    <div><label for="level">Signal level</label>
+      <select id="level" name="level">
+        <option value="0" {{ 'selected' if level == '0' }}>None - normal operation</option>
+        {% for lvl, (name, text) in levels.items() %}<option value="{{ lvl }}" {{ 'selected' if level == lvl|string }}>Signal {{ lvl }} - {{ name }}</option>{% endfor %}
+      </select></div>
+    <div><label for="until">In effect until (optional)</label><input id="until" name="until" type="datetime-local" value="{{ until }}"></div>
+    <div><label for="cap">Signal 3: live searches per user per day</label><input id="cap" name="cap" type="number" min="1" max="1000" value="{{ cap }}"></div>
+    <div class="full"><label for="note">Private note (only administrators see this)</label><input id="note" name="note" value="{{ note }}"></div>
+  </div>
+  <p><small>Administrators are never limited. Saved results can always be opened.</small></p>
+  <div class="btnrow"><button type="submit">Save signal</button></div>
+</form>
+
+<h1>Users</h1>
+<div class="scroll"><table>
+  <thead><tr><th>Username</th><th>Name</th><th>Role</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead>
+  <tbody>
+  {% for u in users %}
+  <tr><td>{{ u.username }}</td><td>{{ u.display_name }}</td><td>{{ u.role }}</td>
+      <td>{{ 'Yes' if u.priority else 'No' }}</td><td>{{ 'Active' if u.active else 'Disabled' }}</td>
+      <td>
+        <form method="post" action="{{ url_for('admin_user_action', uid=u.id, action='priority') }}" style="display:inline"><input type="hidden" name="csrf" value="{{ csrf_token() }}"><button type="submit">{{ 'Remove priority' if u.priority else 'Give priority' }}</button></form>
+        {% if u.id != current_user.id %}<form method="post" action="{{ url_for('admin_user_action', uid=u.id, action='active') }}" style="display:inline"><input type="hidden" name="csrf" value="{{ csrf_token() }}"><button type="submit">{{ 'Disable' if u.active else 'Enable' }}</button></form>{% endif %}
+        <form method="post" action="{{ url_for('admin_user_action', uid=u.id, action='password') }}" style="display:inline-flex;gap:6px;margin-top:6px"><input type="hidden" name="csrf" value="{{ csrf_token() }}"><input name="password" type="password" minlength="8" placeholder="New password" style="width:150px" autocomplete="new-password"><button type="submit">Set</button></form>
+      </td></tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+
+<h1>Add user</h1>
+<form method="post" action="{{ url_for('admin_user_create') }}">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <div class="grid">
+    <div><label for="username">Username</label><input id="username" name="username" required autocomplete="off"></div>
+    <div><label for="display_name">Display name</label><input id="display_name" name="display_name" required></div>
+    <div><label for="password">Password (8+ characters)</label><input id="password" name="password" type="password" minlength="8" required autocomplete="new-password"></div>
+    <div><label for="role">Role</label><select id="role" name="role"><option value="user">User</option><option value="admin">Administrator</option></select></div>
+    <div><label for="system_id">System ID (optional)</label><input id="system_id" name="system_id"></div>
+    <div><label for="organization">Organization (optional)</label><input id="organization" name="organization"></div>
+  </div>
+  <label class="check"><input type="checkbox" name="priority"> Priority permission</label>
+  <div class="btnrow"><button type="submit">Create user</button></div>
+</form>
+{% endblock %}
