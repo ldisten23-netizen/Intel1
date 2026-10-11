@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Saved records</h1>
+<p>Searches records already saved in the database. Nothing is sent anywhere.</p>
+<form method="get" action="{{ url_for('search') }}">
+  <div class="grid">
+    <div class="full"><label for="q">ID number, name, cellphone or student number</label>
+      <input id="q" name="q" value="{{ q }}" required></div>
+    <div><label for="reference">Reference</label>
+      <input id="reference" name="reference" value="{{ ref }}" required></div>
+    <div><label for="reason">Reason for search</label>
+      <select id="reason" name="reason" required>
+        <option value="">Select a reason</option>
+        {% for r in reasons %}<option {{ 'selected' if r==reason }}>{{ r }}</option>{% endfor %}
+      </select></div>
+  </div>
+  <div class="btnrow"><button type="submit">Search</button></div>
+</form>
+
+{% if results is not none %}
+<h1>Results ({{ results|length }})</h1>
+<div class="scroll"><table>
+  <thead><tr><th>Name</th><th>ID number</th><th>Cellphone</th><th>Student no.</th><th></th></tr></thead>
+  <tbody>
+  {% for p in results %}
+    <tr><td>{{ p.first_names }} {{ p.surname }}</td><td>{{ p.id_number }}</td>
+        <td>{{ p.cellphone or '' }}</td><td>{{ p.student_number or '' }}</td>
+        <td><a class="btn" href="{{ url_for('person', pid=p.id, reference=ref, reason=reason) }}">Open</a></td></tr>
+  {% else %}
+    <tr><td colspan="5">No matching records.</td></tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% endif %}
+{% endblock %}
