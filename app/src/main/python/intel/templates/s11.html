@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>s11(3)</h1>
+<div class="warnbox">
+  <b>Warning: this cannot be undone.</b>
+  <p>You are about to permanently delete all data held on <b>{{ full_name }}</b> ({{ p.id_number }}): the record, photo, trace and captured details, comments and saved reports.
+  Nobody else's data is affected. New searches for this ID will be blocked.</p>
+  <p>Are you sure?</p>
+</div>
+<form method="post" action="{{ url_for('person_s11', pid=p.id) }}">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <input type="hidden" name="reference" value="{{ ref }}"><input type="hidden" name="reason" value="{{ reason }}">
+  <div class="btnrow">
+    <button type="submit" class="danger-fill">Yes, delete this person's data</button>
+    <a class="btn ghost" href="{{ url_for('person', pid=p.id, reference=ref, reason=reason) }}">No, go back</a>
+  </div>
+</form>
+{% endblock %}
