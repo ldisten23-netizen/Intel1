@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>CAP/A</h1>
+<p>{{ full_name }} &middot; {{ p.id_number }}</p>
+<form method="post" action="{{ url_for('person_capture', pid=p.id) }}">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <input type="hidden" name="reference" value="{{ ref }}"><input type="hidden" name="reason" value="{{ reason }}">
+  <fieldset><legend>Details</legend>
+    <div class="grid">
+    {% for col, label in fields %}
+      <div{% if col in long %} class="full"{% endif %}><label for="{{ col }}">{{ label }}</label>
+      {% if col in long %}<textarea id="{{ col }}" name="{{ col }}">{{ p[col] or '' }}</textarea>
+      {% else %}<input id="{{ col }}" name="{{ col }}" value="{{ p[col] or '' }}">{% endif %}</div>
+    {% endfor %}
+    </div>
+  </fieldset>
+  <fieldset><legend>Add to the history tables</legend>
+    <div class="grid">
+      <div><label for="add_address_type">Address type</label><input id="add_address_type" name="add_address_type" placeholder="Residential"></div>
+      <div><label for="add_address_postal">Postal code</label><input id="add_address_postal" name="add_address_postal"></div>
+      <div class="full"><label for="add_address_value">Address</label><input id="add_address_value" name="add_address_value"></div>
+      <div><label for="add_phone_type">Contact type</label><input id="add_phone_type" name="add_phone_type" placeholder="Cellular"></div>
+      <div><label for="add_phone_value">Number / email</label><input id="add_phone_value" name="add_phone_value"></div>
+      <div><label for="add_employer_value">Employer name</label><input id="add_employer_value" name="add_employer_value"></div>
+      <div><label for="add_employer_occupation">Occupation</label><input id="add_employer_occupation" name="add_employer_occupation"></div>
+    </div>
+  </fieldset>
+  <div class="btnrow">
+    <button type="submit">Save</button>
+    <a class="btn" style="background:#fff;color:var(--blue);border:1px solid var(--blue)" href="{{ url_for('person', pid=p.id, reference=ref, reason=reason) }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}
