@@ -1,0 +1,12 @@
+.gradle/
+build/
+app/build/
+local.properties
+*.apk
+*.db
+.env
+.secret_key
+photos/
+__pycache__/
+*.pyc
+.idea/
