@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% from "_macros.html" import section %}
+{% block content %}
+<div class="banner">Confidential</div>
+<div class="notice">Any personal information obtained from this search will only be used as per the Terms and Conditions agreed to and in accordance with applicable data protection laws including the Protection of Personal Information Act, 2013 (POPI), and shall not be used for marketing purposes.</div>
+{{ section("Search criteria", criteria) }}
+<div class="banner solo">Real-Time Verification</div>
+<div class="sec"><h3><span>PH</span></h3>
+  <div class="tblwrap"><table class="rt"><thead><tr><th class="n">#</th><th>Name</th><th>ID number</th><th></th></tr></thead><tbody>
+  {% for m in matches %}<tr><td class="n" data-label="#">{{ loop.index }}</td>
+    <td data-label="Name">{{ m.first_names }} {{ m.surname }}</td><td data-label="ID number">{{ m.id_number }}</td>
+    <td><a class="btn" href="{{ url_for('person', pid=m.id, reference=ref, reason=reason) }}">Open</a></td></tr>{% endfor %}
+  </tbody></table></div></div>
+<div class="btnrow"><a class="btn" href="{{ url_for('lookup') }}">New search</a></div>
+{% endblock %}
