@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Add person</h1>
+<form method="post" enctype="multipart/form-data">
+<input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <fieldset><legend>Photo</legend>
+    <label for="photo">Photo (JPG, PNG or WEBP, up to 5 MB)</label>
+    <input id="photo" name="photo" type="file" accept="image/*">
+  </fieldset>
+
+  <fieldset><legend>Personal details</legend><div class="grid">
+    <div><label for="id_number">ID number *</label>
+      <input id="id_number" name="id_number" value="{{ f.get('id_number','') }}" inputmode="numeric" maxlength="13" pattern="\d{13}" required>
+      <small id="idmsg" class="muted"></small></div>
+    <div><label for="date_of_birth">Date of birth (from ID)</label><input id="date_of_birth" name="date_of_birth" value="{{ f.get('date_of_birth','') }}" readonly></div>
+    <div><label for="first_names">First names *</label><input id="first_names" name="first_names" value="{{ f.get('first_names','') }}" required></div>
+    <div><label for="age">Age</label><input id="age" value="" readonly></div>
+    <div><label for="surname">Surname *</label><input id="surname" name="surname" value="{{ f.get('surname','') }}" required></div>
+    <div><label for="gender">Gender (from ID)</label><input id="gender" name="gender" value="{{ f.get('gender','') }}" readonly></div>
+    <div><label for="maiden_surname">Maiden surname</label><input id="maiden_surname" name="maiden_surname" value="{{ f.get('maiden_surname','') }}"></div>
+    <div><label for="citizenship">Citizenship (from ID)</label><input id="citizenship" name="citizenship" value="{{ f.get('citizenship','') }}" readonly></div>
+    <div><label for="married_surname">Married surname</label><input id="married_surname" name="married_surname" value="{{ f.get('married_surname','') }}"></div>
+    <div><label for="marital_status">Marital status</label>
+      <select id="marital_status" name="marital_status"><option value="">Select</option>
+        {% for o in ['SINGLE','MARRIED','DIVORCED','WIDOWED','LIFE PARTNER'] %}<option {{ 'selected' if f.get('marital_status')==o }}>{{ o }}</option>{% endfor %}</select></div>
+    <div><label for="status">Status</label>
+      <select id="status" name="status">
+        {% for o in ['ALIVE','DECEASED','UNKNOWN'] %}<option {{ 'selected' if f.get('status')==o }}>{{ o }}</option>{% endfor %}</select></div>
+    <div><label for="marriage_date">Marriage date</label><input id="marriage_date" name="marriage_date" type="date" value="{{ f.get('marriage_date','') }}"></div>
+  </div></fieldset>
+
+  <fieldset><legend>ID document details</legend><div class="grid">
+    <div><label for="date_issued">ID book issued date</label><input id="date_issued" name="date_issued" type="date" value="{{ f.get('date_issued','') }}"></div>
+    <div><label for="id_card_indicator">ID card indicator</label>
+      <select id="id_card_indicator" name="id_card_indicator"><option value="">Select</option>
+        {% for o in ['YES','NO'] %}<option {{ 'selected' if f.get('id_card_indicator')==o }}>{{ o }}</option>{% endfor %}</select></div>
+  </div></fieldset>
+
+  <fieldset><legend>Consumer identity</legend><div class="grid">
+    <div><label for="title">Title</label><input id="title" name="title" value="{{ f.get('title','') }}"></div>
+    <div><label for="initials">Initials</label><input id="initials" name="initials" value="{{ f.get('initials','') }}"></div>
+  </div></fieldset>
+
+  <fieldset><legend>Address history</legend><div class="grid">
+    <div><label for="add_address_type">Type</label><input id="add_address_type" name="add_address_type" value="{{ f.get('add_address_type','') }}" placeholder="Residential"></div>
+    <div><label for="add_address_postal">Postal code</label><input id="add_address_postal" name="add_address_postal" value="{{ f.get('add_address_postal','') }}"></div>
+    <div class="full"><label for="add_address_value">Address</label><input id="add_address_value" name="add_address_value" value="{{ f.get('add_address_value','') }}"></div>
+  </div></fieldset>
+
+  <fieldset><legend>Contact information</legend><div class="grid">
+    <div><label for="add_phone_type">Type</label><input id="add_phone_type" name="add_phone_type" value="{{ f.get('add_phone_type','') }}" placeholder="Cellular"></div>
+    <div><label for="add_phone_value">Number / email</label><input id="add_phone_value" name="add_phone_value" value="{{ f.get('add_phone_value','') }}"><small id="netmsg2" class="muted"></small></div>
+    <div><label for="cellphone">Cellphone number</label><input id="cellphone" name="cellphone" type="tel" value="{{ f.get('cellphone','') }}"><small id="netmsg" class="muted"></small></div>
+    <div><label for="email">Email</label><input id="email" name="email" type="email" value="{{ f.get('email','') }}"></div>
+    <div class="full"><label for="address">Address (single line)</label><input id="address" name="address" value="{{ f.get('address','') }}"></div>
+  </div></fieldset>
+
+  <fieldset><legend>Employment history</legend><div class="grid">
+    <div><label for="add_employer_value">Employer name</label><input id="add_employer_value" name="add_employer_value" value="{{ f.get('add_employer_value','') }}"></div>
+    <div><label for="add_employer_occupation">Occupation</label><input id="add_employer_occupation" name="add_employer_occupation" value="{{ f.get('add_employer_occupation','') }}"></div>
+  </div></fieldset>
+
+  <fieldset><legend>Qualifications</legend><div class="grid">
+    <div><label for="student_number">Student number</label><input id="student_number" name="student_number" value="{{ f.get('student_number','') }}"></div>
+    <div><label for="institution">Institution</label><input id="institution" name="institution" value="{{ f.get('institution','') }}"></div>
+    <div class="full"><label for="qualification">Qualifications (one per line)</label><textarea id="qualification" name="qualification">{{ f.get('qualification','') }}</textarea></div>
+    <div class="full"><label for="profile">Professional profile, research, teaching and other notes</label><textarea id="profile" name="profile">{{ f.get('profile','') }}</textarea></div>
+  </div></fieldset>
+
+  <div class="btnrow"><button type="submit">Save person</button><a class="btn" href="{{ url_for('dashboard') }}">Cancel</a></div>
+</form>
+<script>
+  // Fills date of birth, age, gender and citizenship from the ID number as you type. The server re-derives them on save.
+  (function () {
+    var id = document.getElementById('id_number'), msg = document.getElementById('idmsg');
+    function luhn(s) {
+      var t = 0; for (var i = 0; i < 13; i++) { var d = +s[12 - i]; if (i % 2) { d *= 2; if (d > 9) d -= 9; } t += d; }
+      return t % 10 === 0;
+    }
+    function set(k, v) { document.getElementById(k).value = v; }
+    function clear() { set('date_of_birth', ''); set('age', ''); set('gender', ''); set('citizenship', ''); }
+    function sync() {
+      var s = id.value.replace(/\s/g, ''); msg.textContent = '';
+      if (s.length !== 13 || !/^\d+$/.test(s)) { clear(); return; }
+      var yy = +s.slice(0, 2), mm = +s.slice(2, 4), dd = +s.slice(4, 6), cur = new Date().getFullYear();
+      var y = yy <= cur % 100 ? 2000 + yy : 1900 + yy, d = new Date(y, mm - 1, dd);
+      if (!luhn(s) || d.getMonth() !== mm - 1 || d.getDate() !== dd) { clear(); msg.textContent = 'Not a valid ID number.'; return; }
+      set('date_of_birth', y + '-' + String(mm).padStart(2, '0') + '-' + String(dd).padStart(2, '0'));
+      var now = new Date(), a = now.getFullYear() - y;
+      if (now < new Date(now.getFullYear(), mm - 1, dd)) a--;
+      set('age', a);
+      set('gender', +s.slice(6, 10) >= 5000 ? 'MALE' : 'FEMALE');
+      set('citizenship', s[10] === '0' ? 'SOUTH AFRICAN' : 'PERMANENT RESIDENT');
+    }
+    id.addEventListener('input', sync); sync();
+
+    // Network from the number's prefix (a guide only: numbers can be ported between networks).
+    var NET = {{ networks|tojson }};
+    function net(v) {
+      var d = (v || '').replace(/\D/g, ''); if (d.indexOf('27') === 0 && d.length === 11) d = '0' + d.slice(2);
+      if (!/^0\d{9}$/.test(d)) return '';
+      return NET[d.slice(0, 4)] || NET[d.slice(0, 3)] || '';
+    }
+    [['cellphone', 'netmsg'], ['add_phone_value', 'netmsg2']].forEach(function (p) {
+      var inp = document.getElementById(p[0]), out = document.getElementById(p[1]);
+      function show() { var n = net(inp.value); out.textContent = n ? 'Network: ' + n : ''; }
+      inp.addEventListener('input', show); show();
+    });
+  })();
+</script>
+{% endblock %}

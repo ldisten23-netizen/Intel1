@@ -1,0 +1,76 @@
+{% from "_macros.html" import section, render_blocks %}<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ file_title or ('Report ' ~ p.id_number) }}</title>
+<style>
+  :root{--blue:#0050e5;--blue-dark:#003fb8;--line:#c5d4f2;--tint:#eef3fe;--ink:#14213d}
+  *{box-sizing:border-box}
+  html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{size:A4;margin:12mm}
+  body{font-family:"Segoe UI",Arial,Helvetica,sans-serif;color:var(--ink);background:#fff;margin:0;padding:18px;font-size:12px;line-height:1.4}
+  .wrap{max-width:780px;margin:0 auto}
+  .head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid var(--blue);padding-bottom:8px;margin-bottom:10px;gap:10px}
+  .brand{display:flex;align-items:center;color:var(--blue)}
+  .brand .one{font-size:46px;font-weight:800;line-height:.9;letter-spacing:-2px;margin-right:8px}
+  .brand b{display:block;font-size:16px;letter-spacing:1.5px}.brand span{font-size:9px;letter-spacing:3.6px;font-weight:600}
+  .date{font-size:11px;color:#3d4f78;text-align:right}
+  .banner{border:2px solid var(--blue);color:var(--blue);text-align:center;font-weight:800;letter-spacing:4px;padding:7px;font-size:14px;text-transform:uppercase}
+  .notice{background:var(--blue);color:#fff;font-size:10px;padding:7px 10px;margin-bottom:12px}
+  .sec{margin:0 0 12px;border:1px solid var(--line);break-inside:avoid}
+  .sec>h3{background:var(--blue);color:#fff;margin:0;padding:6px 10px;font-size:11.5px;letter-spacing:.5px;text-transform:uppercase;display:flex;justify-content:space-between;gap:8px}
+  .sec>h3 small{font-weight:500;letter-spacing:0;text-transform:none}
+  .kvgrid{display:grid;grid-template-columns:1fr 1fr}
+  .kvrow{display:grid;grid-template-columns:36% 64%;border-top:1px solid var(--line)}
+  .kvrow.wide{grid-column:1/-1;grid-template-columns:18% 82%}
+  .kvrow:not(.wide):nth-child(odd) .v{border-right:1px solid var(--line)}
+  .kvrow .k{background:var(--tint);color:#3d4f78;padding:5px 8px}
+  .kvrow .v{padding:5px 8px;font-weight:600;overflow-wrap:anywhere}
+  table.rt{width:100%;border-collapse:collapse}
+  table.rt th{background:var(--tint);color:#3d4f78;text-align:left;padding:5px 8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;border-top:1px solid var(--line)}
+  table.rt td{padding:5px 8px;border-top:1px solid var(--line);font-weight:600;vertical-align:top;overflow-wrap:anywhere}
+  table.rt .n{width:28px;color:#3d4f78;font-weight:500}
+  .who{display:flex;gap:14px;align-items:center;margin:0 0 12px;padding:10px;border:1px solid var(--line);break-inside:avoid}
+  .who img{width:110px;height:138px;object-fit:cover;border:2px solid var(--blue)}
+  .who .ph{width:110px;height:138px;border:2px solid var(--blue);background:var(--tint);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800}
+  .who h2{margin:0;font-size:20px;color:var(--blue)}
+  .flag{border:1px solid var(--blue);color:var(--blue);padding:6px 10px;margin-bottom:12px;font-weight:600}
+</style></head>
+<body><div class="wrap">
+  <div class="head">
+    <div class="brand"><span class="one">1</span><div><b>INFORMATION</b><span>INTELLIGENCE</span></div></div>
+    <div class="date">Report print date<br><b>{{ search_date }}</b></div>
+  </div>
+  <div class="banner">Confidential</div>
+  <div class="notice">Any personal information obtained from this search will only be used as per the Terms and Conditions agreed to and in accordance with applicable data protection laws including the Protection of Personal Information Act, 2013 (POPI), and shall not be used for marketing purposes.</div>
+
+  {{ section("Search criteria", criteria) }}
+
+  <div class="banner" style="margin:0 0 12px">Real-Time Verification</div>
+
+  <div class="who">
+    {% if p.photo %}<img src="{{ url_for('photo', name=p.photo) }}" alt="">
+    {% else %}<div class="ph">{{ (p.first_names or '')[:1] }}{{ (p.surname or '')[:1] }}</div>{% endif %}
+    <div><h2>{{ full_name }}</h2></div>
+  </div>
+
+  {% if trace_hidden %}<div class="flag">Consumer trace data is held on this record but is not shown: the reason for search is not Fraud detection / Fraud prevention.</div>{% endif %}
+
+  {{ render_blocks(blocks) }}
+  <noscript><p><a href="{{ url_for('person', pid=p.id, reference=ref, reason=reason) }}">Back to report</a></p></noscript>
+</div>
+<script>
+  // No buttons: open the print dialog straight away, then return to the report.
+  (function () {
+    var back = {{ url_for('person', pid=p.id, reference=ref, reason=reason)|tojson }}, left = false;
+    function leave() { if (!left) { left = true; location.replace(back); } }
+    window.addEventListener('afterprint', leave);
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        // In the Android app the print dialog comes from the app (choose "Save as PDF" in it for a PDF file).
+        if (window.AndroidPrint && window.AndroidPrint.print) { window.AndroidPrint.print(document.title); }
+        else { window.print(); }
+      }, 400);
+    });
+  })();
+</script>
+</body></html>
