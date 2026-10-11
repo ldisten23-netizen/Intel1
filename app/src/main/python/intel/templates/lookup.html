@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>New search</h1>
+{% if not configured %}
+  <div class="flash error">The search service is not configured. Contact an administrator.</div>
+{% endif %}
+<div class="notice" style="margin-bottom:14px">
+  Mode: <b>{{ mode }}</b>{% if mode == 'sandbox' %}{% endif %}.
+  A person already on file is shown from saved data and is not searched again unless you tick re-run.
+</div>
+
+<form method="post" action="{{ url_for('lookup') }}" id="lookup-form">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <input type="hidden" name="token" value="{{ token }}">
+
+  <fieldset>
+    <legend>Search type</legend>
+    <div class="stypes">
+    {% for code in stypes %}
+      <label class="stype"><input type="radio" name="stype" value="{{ code }}" {{ 'checked' if stype == code }}>
+        <span><b>{{ code }}</b></span></label>
+    {% endfor %}
+    </div>
+  </fieldset>
+
+  <div class="grid">
+    <div class="full" id="idbox"><label for="id_number">South African ID number</label>
+      <input id="id_number" name="id_number" value="{{ f.get('id_number','') }}" inputmode="numeric" maxlength="13" pattern="\d{13}" required></div>
+    <div class="full" id="phonebox" style="display:none"><label for="phone">Cellphone number</label>
+      <input id="phone" name="phone" value="{{ f.get('phone','') }}" inputmode="tel" maxlength="16" placeholder="083 338 7060" disabled></div>
+    <div><label for="reference">Fraud case reference</label>
+      <input id="reference" name="reference" value="{{ f.get('reference','') }}" required minlength="4"></div>
+    <div><label for="reason">Reason for search</label>
+      <select id="reason" name="reason" required>
+        <option value="">Select a reason</option>
+        {% for r in fraud_reasons %}<option {{ 'selected' if r==f.get('reason') }}>{{ r }}</option>{% endfor %}
+      </select></div>
+  </div>
+
+  <div class="box">
+    <p style="margin:0 0 6px">Searches return personal information and are restricted to documented fraud detection and fraud prevention.
+      Use the fraud case number as the reference.</p>
+    <label class="check"><input type="checkbox" name="lawful_basis" required {{ 'checked' if f.get('lawful_basis') }}>
+      I confirm this search is part of a documented fraud workflow, that my business has a lawful basis for it
+      (e.g. POPIA s11(1)(f), NCA Reg. 18(4)(b)) and that it is necessary for this case.</label>
+    <div id="livebox"><label class="check"><input type="checkbox" name="refresh" {{ 'checked' if f.get('refresh') }}>
+      Run again even if this record is already saved</label>
+    {% if signal and signal.level == 5 %}
+    <label class="check"><input type="checkbox" name="priority" {{ 'checked' if f.get('priority') }}>
+      Priority search</label>
+    {% endif %}</div>
+  </div>
+
+  <div class="btnrow"><button type="submit" id="go">Run search</button></div>
+</form>
+<script>
+  // UI convenience only - the server enforces the same rules.
+  var idbox = document.getElementById('idbox'), phonebox = document.getElementById('phonebox'),
+      idin = document.getElementById('id_number'), phin = document.getElementById('phone');
+  function sync() {
+    var ph = document.querySelector('input[name=stype]:checked').value === 'PH';
+    idbox.style.display = ph ? 'none' : ''; phonebox.style.display = ph ? '' : 'none';
+    document.getElementById('livebox').style.display = ph ? 'none' : ''; idin.disabled = ph; phin.disabled = !ph; phin.required = ph;
+  }
+  document.querySelectorAll('input[name=stype]').forEach(function (r) { r.addEventListener('change', sync); });
+  document.getElementById('lookup-form').addEventListener('submit', function () {
+    var b = document.getElementById('go'); b.disabled = true; b.textContent = 'Running...';   // avoid double-submit
+  });
+  sync();
+</script>
+{% endblock %}
